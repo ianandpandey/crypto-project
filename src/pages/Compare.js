@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import CoinPageDesc from "../components/CoinPageComponents/CoinPageDesc";
 import CompareGraph from "../components/ComparePageComponents/CompareGraph";
 import ListFlex from "../components/ComparePageComponents/ListFlex";
 import SelectCoins from "../components/ComparePageComponents/SelectCoins";
@@ -10,7 +11,7 @@ function ComparePage() {
   const [days, setDays] = useState(30);
   const [crypto1Desc, setCrypto1Desc] = useState("");
   const [crypto2Desc, setCrypto2Desc] = useState("");
-
+  const [type, setType] = useState("prices");
   return (
     <>
       <Header />
@@ -28,15 +29,15 @@ function ComparePage() {
         setCrypto1Desc={setCrypto1Desc}
         setCrypto2Desc={setCrypto2Desc}
       />
-      <CompareGraph crypto1={crypto1} crypto2={crypto2} days={days} />
-      <div className="coin-page-div description">
-        <h2>{crypto1}</h2>
-        <p dangerouslySetInnerHTML={{ __html: crypto1Desc }} />
-      </div>
-      <div className="coin-page-div description">
-        <h2>{crypto2}</h2>
-        <p dangerouslySetInnerHTML={{ __html: crypto2Desc }} />
-      </div>
+      <CompareGraph
+        crypto1={crypto1}
+        crypto2={crypto2}
+        days={days}
+        type={type}
+        setType={setType}
+      />
+      <CoinPageDesc name={crypto1} desc={crypto1Desc} />
+      <CoinPageDesc name={crypto2} desc={crypto2Desc} />
     </>
   );
 }

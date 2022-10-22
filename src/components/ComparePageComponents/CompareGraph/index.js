@@ -1,25 +1,19 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { COIN_GECKO_URL } from "../../../constants";
+import { convertNumbers } from "../../../functions/convertNumbers";
+import { getDaysArray } from "../../../functions/getDaysArray";
+import { getPrices } from "../../../functions/getPrices";
+import ColorToggleButton from "../../CoinPageComponents/Toggle";
 import LineChart from "../../DashboardComponents/LineChart";
 import Loader from "../../Loader";
 import "./styles.css";
-function CompareGraph({ crypto1, crypto2, days }) {
+function CompareGraph({ crypto1, crypto2, days, type, setType }) {
   const [prices1, setPrices1] = useState([]);
   const [prices2, setPrices2] = useState([]);
 
   const today = new Date();
   const priorDate = new Date(new Date().setDate(today.getDate() - days));
-
-  var getDaysArray = function (starting, ending) {
-    for (
-      var a = [], d = new Date(starting);
-      d <= new Date(ending);
-      d.setDate(d.getDate() + 1)
-    ) {
-      a.push(new Date(d).getDate() + "/" + (new Date(d).getUTCMonth() + 1));
-    }
-    return a;
-  };
 
   const options = {
     plugins: {
@@ -44,6 +38,24 @@ function CompareGraph({ crypto1, crypto2, days }) {
         type: "linear",
         display: true,
         position: "left",
+        ticks:
+          type == "market_caps"
+            ? {
+                callback: function (value) {
+                  return "$" + convertNumbers(value);
+                },
+              }
+            : type == "total_volumes"
+            ? {
+                callback: function (value) {
+                  return convertNumbers(value);
+                },
+              }
+            : {
+                callback: function (value, index, ticks) {
+                  return "$" + value.toLocaleString();
+                },
+              },
       },
       y1: {
         type: "linear",
@@ -52,6 +64,24 @@ function CompareGraph({ crypto1, crypto2, days }) {
         grid: {
           drawOnChartArea: false,
         },
+        ticks:
+          type == "market_caps"
+            ? {
+                callback: function (value) {
+                  return "$" + convertNumbers(value);
+                },
+              }
+            : type == "total_volumes"
+            ? {
+                callback: function (value) {
+                  return convertNumbers(value);
+                },
+              }
+            : {
+                callback: function (value, index, ticks) {
+                  return "$" + value.toLocaleString();
+                },
+              },
       },
     },
   };
@@ -66,54 +96,32 @@ function CompareGraph({ crypto1, crypto2, days }) {
   }, [crypto1, crypto2, days]);
 
   const getData = async () => {
-    const API_URL = `https://api.coingecko.com/api/v3/coins/${crypto1}/market_chart?vs_currency=usd&days=${days}&interval=daily`;
-
-    const prices_data1 = await axios.get(API_URL, {
-      crossDomain: true,
-    });
-
-    if (!prices_data1) {
-      console.log("No data");
-      return;
-    }
-    setPrices1(prices_data1.data.prices);
-
-    const API_URL2 = `https://api.coingecko.com/api/v3/coins/${crypto2}/market_chart?vs_currency=usd&days=${days}&interval=daily`;
-
-    const prices_data2 = await axios.get(API_URL2, {
-      crossDomain: true,
-    });
-
-    if (!prices_data2) {
-      console.log("No price data");
-      return;
-    }
-
-    setPrices2(prices_data2.data.prices);
-
+    const prices_data1 = await getPrices(crypto1, days, type);
+    setPrices1(prices_data1);
+    const prices_data2 = await getPrices(crypto2, days, type);
+    setPrices2(prices_data2);
     var dates = getDaysArray(priorDate, today);
-
     setChartData({
       labels: dates,
       datasets: [
         {
           label: crypto1,
-          data: prices_data1?.data?.prices?.map((data) => data[1]),
+          data: prices_data1?.map((data) => data[1]),
           borderWidth: 2,
           fill: false,
           tension: 0.25,
-          backgroundColor: "#111",
+          backgroundColor: "transparent",
           borderColor: "#3a80e9",
           pointRadius: 0,
           yAxisID: "y",
         },
         {
           label: crypto2,
-          data: prices_data2?.data?.prices?.map((data) => data[1]),
+          data: prices_data2?.map((data) => data[1]),
           borderWidth: 2,
           fill: false,
           tension: 0.25,
-          backgroundColor: "#111",
+          backgroundColor: "transparent",
           borderColor: "#61c96f",
           pointRadius: 0,
           yAxisID: "y1",
@@ -123,6 +131,17 @@ function CompareGraph({ crypto1, crypto2, days }) {
   };
   return (
     <div className="coin-page-div">
+      <div className="toggle-flex">
+        <ColorToggleButton
+          type={type}
+          setType={setType}
+          days={days}
+          chartData={chartData}
+          setChartData={setChartData}
+          id={crypto1}
+          id2={crypto2}
+        />
+      </div>
       <LineChart chartData={chartData} options={options} />
     </div>
   );
