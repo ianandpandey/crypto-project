@@ -2,7 +2,6 @@
 
 :root {
   --blue: #3a80e9;
-  /* --blue: #0096FF; */
   --white: #ffffff;
   --black: #111;
   --grey: #888;
@@ -202,5 +201,10 @@ td {
   .cursor,
   .cursor-pointer {
     display: none;
+  }
+
+  .pagination-div {
+    margin: 1rem 0.5rem !important;
+    margin-bottom: 2rem !important;
   }
 }

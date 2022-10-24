@@ -50,7 +50,7 @@
   margin-right: auto;
   position: absolute;
   top: 0;
-  right: 0px;
+  right: 0;
   min-width: 270px;
 }
 
@@ -58,7 +58,7 @@
   position: absolute;
   width: 55%;
   object-fit: contain;
-  top: 4rem;
+  top: 7rem;
   right: 0rem;
   min-width: 200px;
 }
@@ -81,7 +81,16 @@
     min-width: 200px;
   }
 }
-
+@media only screen and (max-width: 600px) {
+  .gradient {
+    top: 4rem;
+    min-width: 200px;
+    max-width: 250px;
+    margin-top: 0rem;
+    padding-bottom: 3rem;
+    max-height: 400px;
+  }
+}
 @media only screen and (max-width: 800px) {
   .heading-container {
     width: 100%;
@@ -98,7 +107,7 @@
 
   .img-box {
     width: 100%;
-    right: 25%;
+    margin-top: 5rem;
   }
 
   .gradient {
